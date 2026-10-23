@@ -1,217 +1,288 @@
-// imports.gi
-import * as GObject from 'gi://GObject'
-import * as Gtk from 'gi://Gtk'
+/**
+ * @file Contains the implementation of the custom overrides page.
+ * Handles creating override rows and binding them to settings for the corresponding
+ * window.
+ */
 
-// local modules
-import { list_children, show_err_msg, TIPS_EMPTY } from '../../utils/prefs.js'
-import { constants } from '../../utils/constants.js'
-import { settings } from '../../utils/settings.js'
-import { connections } from '../../utils/connections.js'
-import { gettext as _ } from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js'
-import { AppRowHandler, AppRow } from '../widgets/app_row.js'
-import { RoundedCornersItem } from '../widgets/rounded_corners_item.js'
+import type Gtk from 'gi://Gtk';
+import type {AppRowCallbacks, AppRowClass} from '../widgets/app_row.js';
+import type {PaddingsRowClass} from '../widgets/paddings_row.js';
 
+import Adw from 'gi://Adw';
+import Gdk from 'gi://Gdk';
+import GLib from 'gi://GLib';
+import GObject from 'gi://GObject';
+
+import {gettext as _} from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
+
+import {getPref, setPref} from '../../utils/settings.js';
 import {
-  CustomRoundedCornersCfg,
-  RoundedCornersCfg,
-} from '../../utils/types.js'
-import { uri } from '../../utils/io.js'
+    CustomSettingsRow,
+    CustomSettingsRowClass,
+} from '../widgets/custom_settings_row.js';
 
-// --------------------------------------------------------------- [end imports]
+export const CustomPage = GObject.registerClass(
+    {
+        Template: GLib.uri_resolve_relative(
+            import.meta.url,
+            'custom.ui',
+            GLib.UriFlags.NONE,
+        ),
+        GTypeName: 'PrefsCustom',
+        InternalChildren: ['customGroup'],
+    },
+    class extends Adw.PreferencesPage {
+        private declare _customGroup: Adw.PreferencesGroup;
 
-export const Custom = GObject.registerClass (
-  {
-    Template: uri (import.meta.url, 'custom.ui'),
-    GTypeName: 'RoundedWindowCornersPrefsCustomPage',
-    InternalChildren: ['custom_group', 'add_row_btn'],
-  },
-  class extends Gtk.Box {
-    private _custom_group!: Gtk.ListBox
-    private _add_row_btn!: Gtk.Button
+        readonly #customWindowSettings = getPref(
+            'custom-rounded-corner-settings',
+        );
 
-    private _settings_cfg!: CustomRoundedCornersCfg
+        constructor() {
+            super();
 
-    _init () {
-      super._init ()
-      this._settings_cfg = settings ().custom_rounded_corner_settings
-
-      for (const k in this._settings_cfg) {
-        this.add_row (k, this._settings_cfg[k])
-      }
-
-      connections.get ().connect (this._add_row_btn, 'clicked', () => {
-        const title = ''
-
-        if (this._settings_cfg[title]) {
-          this.show_exists_error_toast (title)
-          return
+            for (const wmClass in this.#customWindowSettings) {
+                this.addWindow(undefined, wmClass);
+            }
         }
 
-        const cfg = settings ().global_rounded_corner_settings
-        this.add_row (title, cfg)
+        /**
+         * Add a new custom settings row for a window.
+         * @param wmClass - The WM_CLASS of the window.
+         */
+        addWindow(_?: Gtk.Button, wmClass?: string) {
+            const callbacks: AppRowCallbacks = {
+                onDelete: row => this.#deleteWindowConfig(row),
+                onWindowChange: (row, oldTitle, newTitle) =>
+                    this.#changeWindow(row, oldTitle, newTitle),
+            };
 
-        this._settings_cfg[title] = cfg
-      })
-    }
-
-    private add_row (
-      title: string,
-      cfg: RoundedCornersCfg
-    ): InstanceType<typeof AppRow> {
-      let rounded_corners_item: RoundedCornersItemType | null =
-        new RoundedCornersItem ()
-
-      const enabled_switch = new Gtk.Switch ({
-        valign: Gtk.Align.CENTER,
-        active: true,
-        visible: true,
-      })
-      ;(rounded_corners_item as RoundedCornersItemType).cfg = cfg
-      enabled_switch.active = cfg.enabled
-
-      const handler = {
-        on_delete: (row, title) => {
-          if (rounded_corners_item != null) {
-            const paddings_row = rounded_corners_item._paddings_row
-            connections.get ().disconnect_all (paddings_row)
-            rounded_corners_item.unwatch ()
-            connections.get ().disconnect_all (enabled_switch)
-            this._custom_group.remove (row)
-
-            delete this._settings_cfg[title]
-            settings ().custom_rounded_corner_settings = this._settings_cfg
-          }
-          rounded_corners_item = null
-        },
-        on_title_changed: (old_title, new_title) => {
-          if (this._settings_cfg[new_title] !== undefined) {
-            this.show_exists_error_toast (new_title)
-            return false
-          }
-
-          const cfg = this._settings_cfg[old_title]
-          delete this._settings_cfg[old_title]
-          this._settings_cfg[new_title] = cfg
-
-          settings ().custom_rounded_corner_settings = this._settings_cfg
-
-          return true
-        },
-        on_open: (row) => {
-          if (!rounded_corners_item) {
-            return
-          }
-          const app_row = row as InstanceType<typeof AppRow>
-          rounded_corners_item.watch ((cfg) => {
-            cfg.enabled = enabled_switch.active
-            this._on_cfg_changed (app_row.title, cfg)
-          })
-          connections.get ().connect (enabled_switch, 'state-set', () => {
-            if (!rounded_corners_item) {
-              return
+            const row = new CustomSettingsRow(callbacks);
+            if (wmClass) {
+                this.#bindRowSettings(row, wmClass);
             }
-            const cfg = rounded_corners_item.cfg
-            cfg.enabled = enabled_switch.active
-            this._on_cfg_changed (app_row.title, cfg)
-            return false
-          })
-          connections
-            .get ()
-            .connect (
-              app_row._expanded_list_box,
-              'row-activated',
-              (me: Gtk.ListBox, row: Gtk.ListBoxRow) => {
-                if (!rounded_corners_item) {
-                  return
-                }
-                if (row == rounded_corners_item._paddings_row) {
-                  rounded_corners_item.update_revealer ()
-                }
-              }
-            )
-        },
-        on_close: () => {
-          if (!rounded_corners_item) {
-            return
-          }
-          connections.get ().disconnect_all (rounded_corners_item._paddings_row)
-          rounded_corners_item.unwatch ()
-          connections.get ().disconnect_all (enabled_switch)
-        },
-      } as AppRowHandler
+            row.set_subtitle(wmClass ?? '');
+            this._customGroup.add(row);
+        }
 
-      const expanded_row = new AppRow (handler)
-      expanded_row.title = title
-      expanded_row.activatable = false
+        /**
+         * Delete custom overrides for a window.
+         * @param row - The row to delete.
+         */
+        #deleteWindowConfig(row: AppRowClass) {
+            delete this.#customWindowSettings[row.subtitle];
+            setPref(
+                'custom-rounded-corner-settings',
+                this.#customWindowSettings,
+            );
+            this._customGroup.remove(row);
+        }
 
-      if (title == '') {
-        expanded_row.description = TIPS_EMPTY ()
-      }
+        /**
+         * Change the window that the override is applied to.
+         * @param row - The row with the override to change.
+         * @param oldWmClass - Current WM_CLASS of the override.
+         * @param newWmClass - New WM_CLASS of the override.
+         * @returns Whether the override was changed successfully.
+         */
+        #changeWindow(
+            row: AppRowClass,
+            oldWmClass: string,
+            newWmClass: string,
+        ) {
+            // If overrides for the new window already exist, show an error.
+            if (this.#customWindowSettings[newWmClass] !== undefined) {
+                const win = this.root as unknown as Adw.PreferencesDialog;
+                win.add_toast(
+                    new Adw.Toast({
+                        title: _(
+                            `Can't add ${newWmClass} to the list, because it already there`,
+                        ),
+                    }),
+                );
+                return false;
+            }
 
-      this._custom_group.append (expanded_row)
+            if (oldWmClass === '') {
+                // If the old WM_CLASS is empty, the override was just created,
+                // so we need to initialize it with the values from global settings.
+                this.#customWindowSettings[newWmClass] = getPref(
+                    'global-rounded-corner-settings',
+                );
+            } else {
+                // Otherwise, move the override to the new window.
+                const cfg = this.#customWindowSettings[oldWmClass];
+                delete this.#customWindowSettings[oldWmClass];
+                this.#customWindowSettings[newWmClass] = cfg;
+            }
 
-      const enabled_row = this.create_enabled_row (enabled_switch)
+            this.#bindRowSettings(row, newWmClass);
 
-      add_row (expanded_row, enabled_row)
+            setPref(
+                'custom-rounded-corner-settings',
+                this.#customWindowSettings,
+            );
 
-      list_children (rounded_corners_item)
-        .filter ((child) => child.name != constants.DON_T_CONFIG)
-        .forEach ((child) => {
-          rounded_corners_item?.remove (child)
-          add_row (expanded_row, child)
-          enabled_switch.bind_property (
-            'active',
-            child,
-            'sensitive',
-            GObject.BindingFlags.SYNC_CREATE
-          )
-        })
+            return true;
+        }
 
-      return expanded_row
-    }
+        /**
+         * Bind widgets of the override row to the respective settings.
+         * @param row - The row to bind.
+         * @param wmClass - WM_CLASS of the window that the override is applied to.
+         */
+        #bindRowSettings(row: AppRowClass, wmClass: string) {
+            if (!(row instanceof CustomSettingsRowClass)) {
+                return;
+            }
+            const r = row as CustomSettingsRowClass;
 
-    private show_exists_error_toast (item: string) {
-      const title = `${item}: ` + _ ('Can\'t add to list, because it has exists')
-      show_err_msg (title)
-    }
+            r.connect('notify::subtitle', (row: CustomSettingsRowClass) => {
+                row.checkState();
+            });
+            r.enabledRow.set_active(
+                this.#customWindowSettings[wmClass].enabled,
+            );
+            r.enabledRow.connect('notify::active', (row: Adw.SwitchRow) => {
+                r.checkState();
+                this.#customWindowSettings[wmClass].enabled = row.get_active();
+                setPref(
+                    'custom-rounded-corner-settings',
+                    this.#customWindowSettings,
+                );
+            });
 
-    private _on_cfg_changed (k: string, v: RoundedCornersCfg) {
-      this._settings_cfg[k] = v
-      settings ().custom_rounded_corner_settings = this._settings_cfg
-    }
+            const color = new Gdk.RGBA();
+            [color.red, color.green, color.blue, color.alpha] =
+                this.#customWindowSettings[wmClass].borderColor;
 
-    private create_enabled_row (active_widget: Gtk.Widget): Gtk.ListBoxRow {
-      const row = new Gtk.ListBoxRow ()
-      const title = new Gtk.Label ({
-        label: _ ('Enable'),
-        halign: Gtk.Align.START,
-      })
-      const description = new Gtk.Label ({
-        label: _ ('Enable custom settings for this window'),
-        halign: Gtk.Align.START,
-        css_classes: ['caption'],
-      })
-      const hbox = new Gtk.Box ({
-        valign: Gtk.Align.CENTER,
-      })
-      const vbox = new Gtk.Box ({
-        orientation: Gtk.Orientation.VERTICAL,
-        hexpand: true,
-      })
+            r.borderColorButton.set_rgba(color);
+            r.borderColorButton.connect(
+                'notify::rgba',
+                (_button: Gtk.ColorDialogButton) => {
+                    const color = r.borderColorButton.get_rgba();
+                    this.#customWindowSettings[wmClass].borderColor = [
+                        color.red,
+                        color.green,
+                        color.blue,
+                        color.alpha,
+                    ];
+                    setPref(
+                        'custom-rounded-corner-settings',
+                        this.#customWindowSettings,
+                    );
+                },
+            );
 
-      vbox.append (title)
-      vbox.append (description)
-      hbox.append (vbox)
-      hbox.append (active_widget)
-      row.set_child (hbox)
-
-      return row
-    }
-  }
-)
-
-function add_row (parent: InstanceType<typeof AppRow>, child: Gtk.Widget) {
-  parent.add_row (child)
-}
-
-type RoundedCornersItemType = InstanceType<typeof RoundedCornersItem>
+            r.cornerRadius.set_value(
+                this.#customWindowSettings[wmClass].borderRadius,
+            );
+            r.cornerRadius.connect('value-changed', (adj: Gtk.Adjustment) => {
+                this.#customWindowSettings[wmClass].borderRadius =
+                    adj.get_value();
+                setPref(
+                    'custom-rounded-corner-settings',
+                    this.#customWindowSettings,
+                );
+            });
+            r.cornerSmoothing.set_value(
+                this.#customWindowSettings[wmClass].smoothing,
+            );
+            r.cornerSmoothing.connect(
+                'value-changed',
+                (adj: Gtk.Adjustment) => {
+                    this.#customWindowSettings[wmClass].smoothing =
+                        adj.get_value();
+                    setPref(
+                        'custom-rounded-corner-settings',
+                        this.#customWindowSettings,
+                    );
+                },
+            );
+            r.keepForMaximized.set_active(
+                this.#customWindowSettings[wmClass].keepRoundedCorners
+                    .maximized,
+            );
+            r.keepForMaximized.connect(
+                'notify::active',
+                (row: Adw.SwitchRow) => {
+                    this.#customWindowSettings[
+                        wmClass
+                    ].keepRoundedCorners.maximized = row.get_active();
+                    setPref(
+                        'custom-rounded-corner-settings',
+                        this.#customWindowSettings,
+                    );
+                },
+            );
+            r.keepForFullscreen.set_active(
+                this.#customWindowSettings[wmClass].keepRoundedCorners
+                    .fullscreen,
+            );
+            r.keepForFullscreen.connect(
+                'notify::active',
+                (row: Adw.SwitchRow) => {
+                    this.#customWindowSettings[
+                        wmClass
+                    ].keepRoundedCorners.fullscreen = row.get_active();
+                    setPref(
+                        'custom-rounded-corner-settings',
+                        this.#customWindowSettings,
+                    );
+                },
+            );
+            r.paddings.paddingTop =
+                this.#customWindowSettings[wmClass].padding.top;
+            r.paddings.connect(
+                'notify::padding-top',
+                (row: PaddingsRowClass) => {
+                    this.#customWindowSettings[wmClass].padding.top =
+                        row.paddingTop;
+                    setPref(
+                        'custom-rounded-corner-settings',
+                        this.#customWindowSettings,
+                    );
+                },
+            );
+            r.paddings.paddingBottom =
+                this.#customWindowSettings[wmClass].padding.bottom;
+            r.paddings.connect(
+                'notify::padding-bottom',
+                (row: PaddingsRowClass) => {
+                    this.#customWindowSettings[wmClass].padding.bottom =
+                        row.paddingBottom;
+                    setPref(
+                        'custom-rounded-corner-settings',
+                        this.#customWindowSettings,
+                    );
+                },
+            );
+            r.paddings.paddingStart =
+                this.#customWindowSettings[wmClass].padding.left;
+            r.paddings.connect(
+                'notify::padding-start',
+                (row: PaddingsRowClass) => {
+                    this.#customWindowSettings[wmClass].padding.left =
+                        row.paddingStart;
+                    setPref(
+                        'custom-rounded-corner-settings',
+                        this.#customWindowSettings,
+                    );
+                },
+            );
+            r.paddings.paddingEnd =
+                this.#customWindowSettings[wmClass].padding.right;
+            r.paddings.connect(
+                'notify::padding-end',
+                (row: PaddingsRowClass) => {
+                    this.#customWindowSettings[wmClass].padding.right =
+                        row.paddingEnd;
+                    setPref(
+                        'custom-rounded-corner-settings',
+                        this.#customWindowSettings,
+                    );
+                },
+            );
+        }
+    },
+);

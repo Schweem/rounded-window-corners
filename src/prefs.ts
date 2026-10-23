@@ -1,59 +1,45 @@
-import * as Gtk from 'gi://Gtk'
-import * as Gdk from 'gi://Gdk'
-import * as Adw from 'gi://Adw'
+/** @file Contains the implementation of the preferences page. */
 
-import { connections } from './utils/connections.js'
-import { init_settings, uninit_settings } from './utils/settings.js'
-import { pages } from './preferences/index.js'
-import { _log } from './utils/log.js'
-import * as Utils from './utils/io.js'
-import { ExtensionPreferences } from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js'
+import type Adw from 'gi://Adw';
 
-export default class RoundedWindowCornresPrefs extends ExtensionPreferences {
-  constructor (metadata: object) {
-    super (metadata)
+import Gdk from 'gi://Gdk';
+import GLib from 'gi://GLib';
+import Gtk from 'gi://Gtk';
 
-    // Classical GTK4 template ui need this to make translatable string works
-    imports.gettext.textdomain (this.uuid)
-    this.initTranslations (this.uuid)
-  }
+import {ExtensionPreferences} from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 
-  _load_css () {
-    const display = Gdk.Display.get_default ()
-    if (display) {
-      const css = new Gtk.CssProvider ()
-      const path = Utils.path (import.meta.url, 'stylesheet-prefs.css')
-      css.load_from_path (path)
-      Gtk.StyleContext.add_provider_for_display (display, css, 0)
-    }
-  }
+import {prefsTabs} from './preferences/index.js';
+import {logDebug} from './utils/log.js';
+import {initPrefs, uninitPrefs} from './utils/settings.js';
 
-  fillPreferencesWindow (win: Adw.PreferencesWindow) {
-    init_settings (this.getSettings ())
+export default class RoundedWindowCornersRebornPrefs extends ExtensionPreferences {
+    // biome-ignore lint/suspicious/useAwait: ExtensionPreferences requires this to be async
+    async fillPreferencesWindow(win: Adw.PreferencesWindow) {
+        initPrefs(this.getSettings());
 
-    for (const page of pages ()) {
-      const pref_page = new Adw.PreferencesPage ({
-        title: page.title,
-        icon_name: page.icon_name,
-      })
-      const group = new Adw.PreferencesGroup ()
-      pref_page.add (group)
-      group.add (page.widget)
-      win.add (pref_page)
+        for (const page of prefsTabs) {
+            win.add(new page());
+        }
+
+        // Disconnect all signals when closing the preferences
+        win.connect('close-request', () => {
+            logDebug('Disconnect Signals');
+            uninitPrefs();
+        });
+
+        this.#loadCss();
     }
 
-    // Disconnect all signal when close prefs
-    win.connect ('close-request', () => {
-      _log ('Disconnect Signals')
-      connections.get ().disconnect_all ()
-      connections.del ()
-      uninit_settings ()
-    })
-
-    this._load_css ()
-  }
-}
-
-declare const imports: {
-  gettext: { textdomain: (uuid: string) => void }
+    #loadCss() {
+        const display = Gdk.Display.get_default();
+        if (display) {
+            const css = new Gtk.CssProvider();
+            const path = GLib.build_filenamev([
+                import.meta.url,
+                'stylesheet-prefs.css',
+            ]);
+            css.load_from_path(path);
+            Gtk.StyleContext.add_provider_for_display(display, css, 0);
+        }
+    }
 }

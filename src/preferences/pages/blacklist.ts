@@ -1,109 +1,131 @@
-// imports.gi
-import * as GObject from 'gi://GObject'
+/**
+ * @file Contains the implementation of the blacklist page.
+ * Handles creating blacklist entries and binding them to settings.
+ */
 
-// Local Modules
-import { show_err_msg, TIPS_EMPTY } from '../../utils/prefs.js'
-import { settings } from '../../utils/settings.js'
-import { connections } from '../../utils/connections.js'
-import { AppRow } from '../../preferences/widgets/app_row.js'
+import type Gtk from 'gi://Gtk';
 
-// types
-import { AppRowHandler } from '../widgets/app_row.js'
+import Adw from 'gi://Adw';
+import Gio from 'gi://Gio';
+import GLib from 'gi://GLib';
+import GObject from 'gi://GObject';
 
-import * as Gtk from 'gi://Gtk'
-import { gettext as _ } from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js'
-import { uri } from '../../utils/io.js'
+import {gettext as _} from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 
-// --------------------------------------------------------------- [end imports]
+import {bindPref, getPref, setPref} from '../../utils/settings.js';
+import {AppRow, type AppRowClass} from '../widgets/app_row.js';
 
-/** Black list Preferences Page */
-export const BlackList = GObject.registerClass (
-  {
-    Template: uri (import.meta.url, 'blacklist.ui'),
-    GTypeName: 'RoundedWindowCornersPrefsBlacklist',
-    InternalChildren: ['black_list_group', 'add_row_btn'],
-  },
-  class extends Gtk.Box {
-    private _black_list_group!: Gtk.ListBox
-    private _add_row_btn!: Gtk.Button
+export const BlacklistPage = GObject.registerClass(
+    {
+        Template: GLib.uri_resolve_relative(
+            import.meta.url,
+            'blacklist.ui',
+            GLib.UriFlags.NONE,
+        ),
+        GTypeName: 'PrefsBlacklist',
+        InternalChildren: ['blacklistGroup', 'useWhitelist'],
+    },
+    class extends Adw.PreferencesPage {
+        private declare _blacklistGroup: Adw.PreferencesGroup;
+        private declare _useWhitelist: Adw.SwitchRow;
 
-    /** Store value of settings */
-    private black_list!: string[]
+        readonly #blacklist = getPref('blacklist');
 
-    _init () {
-      super._init ()
-      this.black_list = settings ().black_list
+        constructor() {
+            super();
 
-      // Read blacklist from settings, and add it to this._black_list
-      this.black_list.forEach ((name) => this.on_add_row (name))
+            bindPref(
+                'whitelist',
+                this._useWhitelist,
+                'active',
+                Gio.SettingsBindFlags.DEFAULT,
+            );
 
-      connections.get ().connect (this._add_row_btn, 'clicked', () => {
-        if (this.black_list.includes ('')) {
-          return
+            for (const title of this.#blacklist) {
+                this.addWindow(undefined, title);
+            }
+
+            // update page title dynamically
+            this._useWhitelist.connect('notify::active', () => {
+                this.#updateBlacklistPageTitle();
+            });
+            this.#updateBlacklistPageTitle();
         }
 
-        this.on_add_row ()
-        this.black_list.push ('')
-        settings ().black_list = this.black_list
-      })
+        /**
+         * Dynamically update the title of the blacklist page
+         * based on the state of the whitelist switch.
+         */
+        #updateBlacklistPageTitle() {
+            const isWhitelist = this._useWhitelist.get_active();
+            const newTitle = isWhitelist
+                ? _('Whitelist') // Title when switch is ON
+                : _('Blacklist'); // Title when switch is OFF
 
-      connections
-        .get ()
-        .connect (
-          this._black_list_group,
-          'row-activated',
-          (me: Gtk.ListBox, row: Gtk.ListBoxRow) => {
-            if (row instanceof AppRow) {
-              row.on_expanded_changed ()
+            this.set_title(newTitle); // changes page Title
+            this._blacklistGroup.set_title(newTitle); // changes group Title
+        }
+
+        /**
+         * Add a new blacklist entry.
+         * @param wmClass - The WM_CLASS of the window.
+         */
+        addWindow(_?: Gtk.Button, wmClass?: string) {
+            const row = new AppRow({
+                onDelete: (row: AppRowClass) => this.#deleteWindow(row),
+                onWindowChange: (
+                    _: AppRowClass,
+                    oldWmClass: string,
+                    newWmClass: string,
+                ) => this.#changeWindow(oldWmClass, newWmClass),
+            });
+            row.set_subtitle(wmClass ?? '');
+            this._blacklistGroup.add(row);
+        }
+
+        /**
+         * Delete a blacklist entry.
+         * @param row - The row to delete.
+         */
+        #deleteWindow(row: AppRowClass) {
+            this.#blacklist.splice(this.#blacklist.indexOf(row.title), 1);
+            setPref('blacklist', this.#blacklist);
+            this._blacklistGroup.remove(row);
+        }
+
+        /**
+         * Change the blacklist entry to a different window.
+         * @param oldWmClass - Current WM_CLASS of the entry.
+         * @param newWmClass - New WM_CLASS of the entry.
+         * @returns Whether the entry was changed successfully.
+         */
+        #changeWindow(oldWmClass: string, newWmClass: string) {
+            if (this.#blacklist.includes(newWmClass)) {
+                // If the new window is already in the blacklist, show an error.
+                const win = this.root as unknown as Adw.PreferencesDialog;
+                win.add_toast(
+                    new Adw.Toast({
+                        title: _(
+                            `Can't add ${newWmClass} to the list, because it already there`,
+                        ),
+                    }),
+                );
+                return false;
             }
-          }
-        )
-    }
 
-    private show_err_msg (item: string) {
-      const title = `${item}: ` + _ ('Can\'t add to list, because it has exists')
-      show_err_msg (title)
-    }
+            if (oldWmClass === '') {
+                // If the old WM_CLASS is empty, the entry was just created,
+                // so we need to just add the new window to the blacklist.
+                this.#blacklist.push(newWmClass);
+            } else {
+                // Otherwise, replace the old window with the new one.
+                const oldId = this.#blacklist.indexOf(oldWmClass);
+                this.#blacklist.splice(oldId, 1, newWmClass);
+            }
 
-    // --------------------------------------------------- [signal handlers]
+            setPref('blacklist', this.#blacklist);
 
-    private on_delete_row (row: Gtk.ListBoxRow, title: string) {
-      this.black_list.splice (this.black_list.indexOf (title), 1)
-      settings ().black_list = this.black_list
-      this._black_list_group.remove (row)
-    }
-
-    /** Add a row to black list */
-    private on_add_row (title = '') {
-      const handlers: AppRowHandler = {
-        on_delete: (row, title) => this.on_delete_row (row, title),
-        on_title_changed: (old_title, new_title) =>
-          this.on_title_changed (old_title, new_title),
-      }
-
-      const row = new AppRow (handlers)
-      row.title = title
-
-      if (!title) {
-        row.description = TIPS_EMPTY ()
-      }
-
-      this._black_list_group.append (row)
-    }
-
-    /** Called when title of item need to changed  */
-    on_title_changed (old_title: string, new_title: string): boolean {
-      if (this.black_list.includes (new_title)) {
-        this.show_err_msg (new_title)
-        return false
-      }
-
-      const old_idx = this.black_list.indexOf (old_title)
-      this.black_list.splice (old_idx, 1, new_title)
-
-      settings ().black_list = this.black_list
-
-      return true
-    }
-  }
-)
+            return true;
+        }
+    },
+);

@@ -1,25 +1,25 @@
-import * as Clutter from 'gi://Clutter'
-import * as Cogl from 'gi://Cogl'
-import * as GObject from 'gi://GObject'
-import * as Shell from 'gi://Shell'
+/**
+ * @file Applies linear interpolation to a window. This is used to make windows
+ * in the overview look better.
+ */
 
-export const LinearFilterEffect = GObject.registerClass (
-  {},
-  class extends Shell.GLSLEffect {
-    vfunc_build_pipeline (): void {
-      this.add_glsl_snippet (Shell.SnippetHook.FRAGMENT, '', '', false)
-    }
+import type Clutter from 'gi://Clutter';
 
-    vfunc_paint_target (
-      node: Clutter.PaintNode,
-      ctx: Clutter.PaintContext
-    ): void {
-      this.get_pipeline ()?.set_layer_filters (
-        0,
-        Cogl.PipelineFilter.LINEAR_MIPMAP_LINEAR,
-        Cogl.PipelineFilter.NEAREST
-      )
-      super.vfunc_paint_target (node, ctx)
-    }
-  }
-)
+import Cogl from 'gi://Cogl';
+import GObject from 'gi://GObject';
+
+import {snippetEffect} from './snippet_effect.js';
+
+export const LinearFilterEffect = GObject.registerClass(
+    {},
+    class extends snippetEffect('RwcSnippetEffectLinearFilter', '', '') {
+        vfunc_paint_target(node: Clutter.PaintNode, ctx: Clutter.PaintContext) {
+            this.get_pipeline()?.set_layer_filters(
+                0,
+                Cogl.PipelineFilter.LINEAR_MIPMAP_LINEAR,
+                Cogl.PipelineFilter.LINEAR,
+            );
+            super.vfunc_paint_target(node, ctx);
+        }
+    },
+);

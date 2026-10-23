@@ -1,32 +1,25 @@
-// imports.gi
-import * as GObject from 'gi://GObject'
-import * as Shell from 'gi://Shell'
-import * as Clutter from 'gi://Clutter'
+/**
+ * @file Clips shadows for windows.
+ *
+ * Needed because of this issue:
+ * https://gitlab.gnome.org/GNOME/gnome-shell/-/issues/4474
+ */
 
-// local modules
-import { loadShader } from '../utils/io.js'
+import GObject from 'gi://GObject';
 
-// ------------------------------------------------------------------- [imports]
+import {readShader} from '../utils/file.js';
+import {snippetEffect} from './snippet_effect.js';
 
-const { declarations, code } = loadShader (
-  import.meta.url,
-  'shader/clip_shadow.frag'
-)
+const [declarations, code] = await readShader(
+    import.meta.url,
+    'shader/clip_shadow.frag',
+);
 
-export const ClipShadowEffect = GObject.registerClass (
-  {},
-  class extends Shell.GLSLEffect {
-    vfunc_build_pipeline (): void {
-      const hook = Shell.SnippetHook.FRAGMENT
-      this.add_glsl_snippet (hook, declarations, code, false)
-    }
-
-    vfunc_paint_target (node: Clutter.PaintNode, ctx: Clutter.PaintContext) {
-      // Reset to default blend string.
-      this.get_pipeline ()?.set_blend (
-        'RGBA = ADD(SRC_COLOR, DST_COLOR*(1-SRC_COLOR[A]))'
-      )
-      super.vfunc_paint_target (node, ctx)
-    }
-  }
-)
+export const ClipShadowEffect = GObject.registerClass(
+    {},
+    class extends snippetEffect(
+        'RwcSnippetEffectClipShadow',
+        declarations,
+        code,
+    ) {},
+);

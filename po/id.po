@@ -1,162 +1,27 @@
 msgid ""
 msgstr ""
-"Report-Msgid-Bugs-To: yilozt@outlook.com\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-04-13 15:46+0200\n"
 "PO-Revision-Date: 2023-05-24 00:51+0000\n"
 "Last-Translator: Reza Almanda <rezaalmanda27@gmail.com>\n"
-"Language-Team: Indonesian <https://hosted.weblate.org/projects/"
-"rounded-window-corners/rounded-window-corners/id/>\n"
+"Language-Team: Indonesian <https://hosted.weblate.org/projects/rounded-"
+"window-corners/rounded-window-corners/id/>\n"
 "Language: id\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Weblate 4.18-dev\n"
 
-#: src/preferences/pages/general.ui:284
-msgid "Add Settings Entry in right-click menu of Background"
-msgstr "Tambahkan Entri Pengaturan di menu klik kanan Latar Belakang"
-
-#: src/preferences/pages/blacklist.ui:38 src/preferences/pages/custom.ui:38
-msgid "Add Window"
-msgstr "Tambahkan Jendela"
-
-#: src/preferences/widgets/rounded-corners-item.ui:130
-msgid "Always keep rounded corners when window is fullscreen."
-msgstr "Selalu pertahankan sudut membulat saat jendela dalam layar penuh."
-
-#: src/preferences/widgets/rounded-corners-item.ui:93
-msgid "Always keep rounded corners when window is maximized or tiled."
-msgstr ""
-"Selalu pertahankan sudut membulat saat jendela dimaksimalkan atau dijadikan "
-"ubin."
-
-#: src/preferences/pages/general.ui:10
-msgid "Applications"
-msgstr "Aplikasi"
-
-#: src/preferences/widgets/app-row.ui:92
-msgid "Apply"
-msgstr "Terapkan"
-
-#: src/preferences/index.ts:17
-msgid "Blacklist"
+#: src/preferences/pages/blacklist.ui:6 src/preferences/pages/blacklist.ui:10
+#, fuzzy
+msgid "Blacklist / Whitelist"
 msgstr "Daftar hitam"
 
-#: src/preferences/widgets/edit-shadow-window.ui:87
-msgid "Blur Offset"
-msgstr "Offset Buram"
-
-#: src/preferences/pages/general.ui:201
-#: src/preferences/widgets/reset_dialog.ts:65
-msgid "Border Color"
-msgstr "Warna Border"
-
-#: src/preferences/widgets/reset_dialog.ts:70
-#: src/preferences/widgets/rounded-corners-item.ui:19
-msgid "Border Radius"
-msgstr "Radius Border"
-
-#: src/preferences/pages/general.ui:168
-#: src/preferences/widgets/reset_dialog.ts:64
-msgid "Border Width"
-msgstr "Lebar Border"
-
-#: src/preferences/widgets/rounded-corners-item.ui:309
-msgid "Bottom"
-msgstr "Bawah"
-
-#: src/preferences/pages/blacklist.ts:65 src/preferences/pages/custom.ts:177
-msgid "Can't add to list, because it has exists"
-msgstr "Tidak dapat menambahkan ke daftar, karena sudah ada"
-
-#: src/preferences/widgets/app_row.ts:106
-msgid "Can't pick a window window from this position"
-msgstr "Tidak dapat memilih jendela dari posisi ini"
-
-#: src/preferences/widgets/rounded-corners-item.ui:170
-msgid "Clip paddings of window"
-msgstr "Clip paddings jendela"
-
-#: src/preferences/widgets/reset_dialog.ts:75
-#: src/preferences/widgets/rounded-corners-item.ui:53
-msgid "Corner Smoothing"
-msgstr "Penghalusan Sudut"
-
-#: src/preferences/index.ts:22
-msgid "Custom"
-msgstr "Kustom"
-
-#: src/preferences/pages/general.ui:107
-msgid "Customize the shadow of the rounded corner window"
-msgstr "Sesuaikan bayangan jendela sudut membulat"
-
-#: src/preferences/pages/general.ui:304
-msgid "Debug"
-msgstr "Debug"
-
-#: src/preferences/widgets/edit_shadow_window.ts:58
-msgid "Edit Shadow for Rounded Corners Windows"
-msgstr "Edit Bayangan untuk Jendela Sudut Bulat"
-
-#: src/preferences/pages/custom.ts:189
-msgid "Enable"
-msgstr "Aktifkan"
-
-#: src/preferences/pages/custom.ts:193
-msgid "Enable custom settings for this window"
-msgstr "Aktifkan pengaturan khusus untuk jendela ini"
-
-#: src/preferences/pages/general.ui:329
-#: src/preferences/widgets/reset_dialog.ts:66
-msgid "Enable Log"
-msgstr "Aktifkan Log"
-
-#: src/utils/constants.ts:17
-msgid "Expand this row to pick a window."
-msgstr "Luaskan baris ini untuk memilih jendela."
-
-#: src/preferences/widgets/edit-shadow-window.ui:26
-msgid "Focus Window"
-msgstr "Jendela Fokus"
-
-#: src/preferences/widgets/reset_dialog.ts:62
-msgid "Focus Window Shadow Style"
-msgstr "Gaya Bayangan Jendela Fokus"
-
-#: src/preferences/index.ts:12
-msgid "General"
-msgstr "Umum"
-
-#: src/preferences/pages/general.ui:132
-msgid "Global Settings"
-msgstr "Pengaturan Umum"
-
-#: src/preferences/widgets/edit-shadow-window.ui:46
-msgid "Horizontal Offset"
-msgstr "Offset Horisontal"
-
-#: src/preferences/widgets/rounded-corners-item.ui:123
-msgid "Keep Rounded Corners when Fullscreen"
-msgstr "Pertahankan Sudut Bulat saat Layar Penuh"
-
-#: src/preferences/widgets/rounded-corners-item.ui:86
-msgid "Keep Rounded Corners when Maximized"
-msgstr "Pertahankan Sudut Bulat saat Dimaksimalkan"
-
-#: src/preferences/widgets/reset_dialog.ts:73
-msgid "Keep Rounded Corners when Maximized or Fullscreen"
-msgstr "Pertahankan Sudut Bulat saat Dimaksimalkan atau Layar Penuh"
-
-#: src/preferences/widgets/rounded-corners-item.ui:210
-msgid "Left"
-msgstr "Kiri"
-
-#: src/preferences/pages/blacklist.ui:14
+#: src/preferences/pages/blacklist.ui:11
+#, fuzzy
 msgid ""
 "Not all application can works well with rounded corners effects, add them to "
-"this list to disable effects.\n"
-"\n"
-"The item of list is instance part of WM_CLASS property with window. You can "
-"pick a window to add it into this list."
+"this list to disable effects."
 msgstr ""
 "Tidak semua aplikasi dapat bekerja dengan baik dengan efek sudut membulat, "
 "tambahkan ke daftar ini untuk menonaktifkan efek.\n"
@@ -164,125 +29,381 @@ msgstr ""
 "Item daftar adalah bagian instan dari properti WM_CLASS dengan jendela. Anda "
 "dapat memilih jendela untuk menambahkannya ke dalam daftar ini."
 
-#: src/preferences/widgets/edit-shadow-window.ui:126
+#: src/preferences/pages/blacklist.ui:14
+#, fuzzy
+msgid "Use as Whitelist"
+msgstr "Daftar hitam"
+
+#: src/preferences/pages/blacklist.ui:15
+msgid ""
+"When selected, instead of omitting certain windows, only allows certain "
+"windows."
+msgstr ""
+
+#: src/preferences/pages/blacklist.ui:25 src/preferences/pages/custom.ui:19
+#, fuzzy
+msgid "Add window"
+msgstr "Tambahkan Jendela"
+
+#: src/preferences/pages/custom.ui:6 src/preferences/pages/custom.ui:10
+msgid "Custom"
+msgstr "Kustom"
+
+#: src/preferences/pages/custom.ui:11
+#, fuzzy
+msgid "Set custom effect setting for each window class"
+msgstr "Aktifkan pengaturan khusus untuk jendela ini"
+
+#: src/preferences/pages/edit-shadow.ui:6
+msgid "Edit shadows"
+msgstr ""
+
+#: src/preferences/pages/edit-shadow.ui:28
+#, fuzzy
+msgid "Focused window"
+msgstr "Jendela Fokus"
+
+#: src/preferences/pages/edit-shadow.ui:43
+#, fuzzy
+msgid "Unfocused window"
+msgstr "Jendela Tidak Fokus"
+
+#: src/preferences/pages/edit-shadow.ui:66
+#, fuzzy
+msgid "Focused shadow preferences"
+msgstr "Atur Ulang Preferensi"
+
+#: src/preferences/pages/edit-shadow.ui:69
+#: src/preferences/pages/edit-shadow.ui:209
+#, fuzzy
+msgid "Horizontal offset"
+msgstr "Offset Horisontal"
+
+#: src/preferences/pages/edit-shadow.ui:96
+#: src/preferences/pages/edit-shadow.ui:236
+#, fuzzy
+msgid "Vertical offset"
+msgstr "Offset Vertikal"
+
+#: src/preferences/pages/edit-shadow.ui:123
+#: src/preferences/pages/edit-shadow.ui:263
+#, fuzzy
+msgid "Blur radius"
+msgstr "Radius Border"
+
+#: src/preferences/pages/edit-shadow.ui:150
+#: src/preferences/pages/edit-shadow.ui:290
+#, fuzzy
+msgid "Spread radius"
+msgstr "Penyebaran Radius"
+
+#: src/preferences/pages/edit-shadow.ui:177
+#: src/preferences/pages/edit-shadow.ui:317
 msgid "Opacity"
 msgstr "Kegelapan"
 
-#: src/preferences/pages/general.ui:367
-msgid "Open Reset Preferences Dialog"
-msgstr "Buka Dialog Atur Ulang Preferensi"
-
-#: src/preferences/widgets/reset_dialog.ts:71
-msgid "Padding"
-msgstr "Lapisan"
-
-#: src/preferences/widgets/rounded-corners-item.ui:163
-msgid "Paddings"
-msgstr "Lapisan-lapisan"
-
-#: src/preferences/widgets/app-row.ui:77
-msgid "Pick Window to add into list"
-msgstr "Pilih Jendela untuk ditambahkan ke daftar"
-
-#: src/preferences/widgets/app-row.ui:36
-msgid "Remove Window from this List"
-msgstr "Hapus Jendela dari Daftar ini"
-
-#: src/preferences/pages/general.ui:359
-msgid "Reset Preferences"
+#: src/preferences/pages/edit-shadow.ui:206
+#, fuzzy
+msgid "Unfocused shadow preferences"
 msgstr "Atur Ulang Preferensi"
 
-#: src/preferences/widgets/rounded-corners-item.ui:243
-msgid "Right"
-msgstr "Kanan"
+#: src/preferences/pages/general.ui:6
+msgid "General"
+msgstr "Umum"
 
-#: src/utils/constants.ts:21
-msgid "Rounded Corners Settings..."
-msgstr "Pengaturan Sudut Bulat..."
+#: src/preferences/pages/general.ui:10
+msgid "Applications"
+msgstr "Aplikasi"
 
-#: src/preferences/pages/general.ui:336
+#: src/preferences/pages/general.ui:11
+#, fuzzy
 msgid ""
-"Run <i>journalctl -o cat -f /usr/bin/gnome-shell</i> in terminal to see the "
-"log"
-msgstr ""
-"Jalankan <i>journalctl -o cat -f /usr/bin/gnome-shell</i> di terminal untuk "
-"melihat log"
-
-#: src/preferences/widgets/reset_dialog.ts:96
-msgid "Select All"
-msgstr "Pilih Semua"
-
-#: src/preferences/widgets/reset_dialog.ts:87
-msgid "Select Items to reset"
-msgstr "Pilih Item yang akan disetel ulang"
-
-#: src/preferences/pages/custom.ui:14
-msgid ""
-"Setup different clip padding by add window into this list.\n"
-"\n"
-"The item of list is instance part of WM_CLASS property with window. You can "
-"pick a window to add it into this list."
-msgstr ""
-"Siapkan lapisan klip yang berbeda dengan menambahkan jendela ke dalam daftar "
-"ini.\n"
-"\n"
-"Item daftar adalah bagian instan dari properti WM_CLASS dengan jendela. Anda "
-"dapat memilih jendela untuk menambahkannya ke dalam daftar ini."
-
-#: src/preferences/pages/general.ui:47
-#: src/preferences/widgets/reset_dialog.ts:60
-msgid "Skip LibAdwaita Applications"
-msgstr "Lewati Aplikasi LibAdwaita"
-
-#: src/preferences/pages/general.ui:74
-#: src/preferences/widgets/reset_dialog.ts:61
-msgid "Skip LibHandy Applications"
-msgstr "Lewati Aplikasi LibHandy"
-
-#: src/preferences/pages/general.ui:23
-msgid ""
-"Some applications written using LibAdwaita or LibHandy already have native "
-"rounded corners, so we can skip them through these settings"
+"Some applications created with LibAdwaita or LibHandy already have rounded "
+"corners. You can enable those settings to avoid rounding their corners an "
+"extra time."
 msgstr ""
 "Beberapa aplikasi yang ditulis menggunakan LibAdwaita atau LibHandy sudah "
 "memiliki sudut bulat asli, jadi kami dapat melewatinya melalui pengaturan ini"
 
-#: src/preferences/widgets/edit-shadow-window.ui:107
-msgid "Spread Radius"
-msgstr "Penyebaran Radius"
+#: src/preferences/pages/general.ui:14
+#, fuzzy
+msgid "Skip LibAdwaita applications"
+msgstr "Lewati Aplikasi LibAdwaita"
 
-#: src/preferences/pages/general.ui:143
-msgid "This settings will try to effects all windows"
+#: src/preferences/pages/general.ui:19
+#, fuzzy
+msgid "Skip LibHandy applications"
+msgstr "Lewati Aplikasi LibHandy"
+
+#: src/preferences/pages/general.ui:26
+#, fuzzy
+msgid "Global settings"
+msgstr "Pengaturan Umum"
+
+#: src/preferences/pages/general.ui:27
+#, fuzzy
+msgid "These settings will have an effect on all windows"
 msgstr "Pengaturan ini akan mencoba mempengaruhi semua jendela"
 
-#: src/preferences/widgets/rounded-corners-item.ui:276
-msgid "Top"
-msgstr "Atas"
+#: src/preferences/pages/general.ui:30
+#, fuzzy
+msgid "Border width"
+msgstr "Lebar Border"
 
-#: src/preferences/pages/general.ui:247
-msgid "Try to add rounded corners to Kitty Terminal in Wayland"
-msgstr "Coba tambahkan sudut membulat ke Terminal Kitty di Wayland"
+#: src/preferences/pages/general.ui:57 src/preferences/pages/general.ui:65
+#: src/preferences/widgets/custom_settings_row.ts:20
+#, fuzzy
+msgid "Border color"
+msgstr "Warna Border"
 
-#: src/preferences/pages/general.ui:254
-msgid "Tweak clip paddings for Kitty Terminal"
-msgstr "Tweak lapisan klip untuk Terminal Kitty"
+#: src/preferences/pages/general.ui:74
+#: src/preferences/widgets/custom_settings_row.ts:28
+#, fuzzy
+msgid "Corner radius"
+msgstr "Radius Border"
 
-#: src/preferences/pages/general.ui:222
+#: src/preferences/pages/general.ui:101
+#: src/preferences/widgets/custom_settings_row.ts:38
+#, fuzzy
+msgid "Corner smoothing"
+msgstr "Penghalusan Sudut"
+
+#: src/preferences/pages/general.ui:127
+#, fuzzy
+msgid "Window shadow"
+msgstr "Bayangan Jendela"
+
+#: src/preferences/pages/general.ui:128
+msgid "Customize the shadow of the rounded corner window"
+msgstr "Sesuaikan bayangan jendela sudut membulat"
+
+#: src/preferences/pages/general.ui:140
+#, fuzzy
+msgid "Keep shadows for maximized and fullscreen windows"
+msgstr "Pertahankan Sudut Bulat saat Layar Penuh"
+
+#: src/preferences/pages/general.ui:145
+#, fuzzy
+msgid "Keep rounded corners for maximized windows"
+msgstr "Pertahankan Sudut Bulat saat Dimaksimalkan"
+
+#: src/preferences/pages/general.ui:150
+#, fuzzy
+msgid "Keep rounded corners for fullscreen windows"
+msgstr "Pertahankan Sudut Bulat saat Layar Penuh"
+
+#: src/preferences/pages/general.ui:160
 msgid "Tweaks"
 msgstr "Oprekan"
 
-#: src/preferences/widgets/edit-shadow-window.ui:35
-msgid "Unfocus Window"
-msgstr "Jendela Tidak Fokus"
+#: src/preferences/pages/general.ui:163
+#, fuzzy
+msgid "Add rounded corners to Kitty Terminal on Wayland"
+msgstr "Coba tambahkan sudut membulat ke Terminal Kitty di Wayland"
 
-#: src/preferences/widgets/reset_dialog.ts:63
-msgid "Unfocus Window Shadow Style"
-msgstr "Gaya Bayangan Jendela Tidak Fokus"
+#: src/preferences/pages/general.ui:164
+msgid "Adjust paddings for Kitty Terminal to correctly round its corners"
+msgstr ""
 
-#: src/preferences/widgets/edit-shadow-window.ui:66
-msgid "Vertical Offset"
-msgstr "Offset Vertikal"
+#: src/preferences/pages/general.ui:171
+msgid "Debug"
+msgstr "Debug"
 
-#: src/preferences/pages/general.ui:101
-msgid "Window Shadow"
+#: src/preferences/pages/general.ui:174
+#, fuzzy
+msgid "Enable debug logs"
+msgstr "Aktifkan Log"
+
+#: src/preferences/pages/general.ui:175
+#, fuzzy
+msgid ""
+"Run journalctl -o cat -f /usr/bin/gnome-shell in your terminal to see the log"
+msgstr ""
+"Jalankan <i>journalctl -o cat -f /usr/bin/gnome-shell</i> di terminal untuk "
+"melihat log"
+
+#: src/preferences/pages/general.ui:184
+#, fuzzy
+msgid "Reset preferences"
+msgstr "Atur Ulang Preferensi"
+
+#: src/preferences/pages/reset.ui:6
+msgid "Reset settings"
+msgstr ""
+
+#: src/preferences/pages/reset.ui:16
+#, fuzzy
+msgid "Settings to reset"
+msgstr "Pilih Item yang akan disetel ulang"
+
+#: src/preferences/pages/reset.ui:22
+#, fuzzy
+msgid "Select all"
+msgstr "Pilih Semua"
+
+#: src/preferences/pages/reset.ui:39
+msgid "Reset"
+msgstr ""
+
+#: src/preferences/pages/reset.ui:55
+msgid "Reset these settings?"
+msgstr ""
+
+#: src/preferences/pages/reset.ui:60
+msgid "_Cancel"
+msgstr ""
+
+#: src/preferences/pages/reset.ui:61
+msgid "_Reset"
+msgstr ""
+
+#: src/preferences/widgets/paddings-row.ui:12
+msgid "Paddings"
+msgstr "Lapisan-lapisan"
+
+#: src/preferences/widgets/paddings-row.ui:25
+msgid "Top"
+msgstr "Atas"
+
+#: src/preferences/widgets/paddings-row.ui:40
+msgid "Bottom"
+msgstr "Bawah"
+
+#: src/preferences/widgets/paddings-row.ui:55
+msgid "Left"
+msgstr "Kiri"
+
+#: src/preferences/widgets/paddings-row.ui:70
+msgid "Right"
+msgstr "Kanan"
+
+#: src/preferences/pages/blacklist.ts:62
+#, fuzzy
+msgid "Whitelist"
+msgstr "Daftar hitam"
+
+#: src/preferences/pages/blacklist.ts:63
+msgid "Blacklist"
+msgstr "Daftar hitam"
+
+#: src/preferences/widgets/app_row.ts:34
+#, fuzzy
+msgid "Window class"
 msgstr "Bayangan Jendela"
+
+#: src/preferences/widgets/app_row.ts:55
+#, fuzzy
+msgid "Expand this row, to pick a window"
+msgstr "Luaskan baris ini untuk memilih jendela."
+
+#: src/preferences/widgets/app_row.ts:95
+#, fuzzy
+msgid "Can't pick window from this position"
+msgstr "Tidak dapat memilih jendela dari posisi ini"
+
+#: src/preferences/widgets/custom_settings_row.ts:16
+#, fuzzy
+msgid "Enabled"
+msgstr "Aktifkan"
+
+#: src/preferences/widgets/custom_settings_row.ts:48
+#, fuzzy
+msgid "Keep rounded corners when maximized"
+msgstr "Pertahankan Sudut Bulat saat Dimaksimalkan"
+
+#: src/preferences/widgets/custom_settings_row.ts:50
+#, fuzzy
+msgid "Always clip rounded corners even if window is maximized or tiled"
+msgstr ""
+"Selalu pertahankan sudut membulat saat jendela dimaksimalkan atau dijadikan "
+"ubin."
+
+#: src/preferences/widgets/custom_settings_row.ts:54
+#, fuzzy
+msgid "Keep rounded corners when in fullscreen"
+msgstr "Pertahankan Sudut Bulat saat Layar Penuh"
+
+#: src/preferences/widgets/custom_settings_row.ts:55
+#, fuzzy
+msgid "Always clip rounded corners even for fullscreen window"
+msgstr "Selalu pertahankan sudut membulat saat jendela dalam layar penuh."
+
+#~ msgid "Rounded Corners Settings..."
+#~ msgstr "Pengaturan Sudut Bulat..."
+
+#, fuzzy
+#~ msgid "Add a settings entry in right-click menu of the desktop"
+#~ msgstr "Tambahkan Entri Pengaturan di menu klik kanan Latar Belakang"
+
+#~ msgid "Tweak clip paddings for Kitty Terminal"
+#~ msgstr "Tweak lapisan klip untuk Terminal Kitty"
+
+#, fuzzy
+#~ msgid "Open prefereces reset page"
+#~ msgstr "Buka Dialog Atur Ulang Preferensi"
+
+#~ msgid "Skip LibAdwaita Applications"
+#~ msgstr "Lewati Aplikasi LibAdwaita"
+
+#~ msgid "Skip LibHandy Applications"
+#~ msgstr "Lewati Aplikasi LibHandy"
+
+#~ msgid "Focus Window Shadow Style"
+#~ msgstr "Gaya Bayangan Jendela Fokus"
+
+#~ msgid "Unfocus Window Shadow Style"
+#~ msgstr "Gaya Bayangan Jendela Tidak Fokus"
+
+#~ msgid "Border Width"
+#~ msgstr "Lebar Border"
+
+#~ msgid "Border Color"
+#~ msgstr "Warna Border"
+
+#~ msgid "Border Radius"
+#~ msgstr "Radius Border"
+
+#~ msgid "Padding"
+#~ msgstr "Lapisan"
+
+#~ msgid "Keep Rounded Corners when Maximized or Fullscreen"
+#~ msgstr "Pertahankan Sudut Bulat saat Dimaksimalkan atau Layar Penuh"
+
+#~ msgid "Corner Smoothing"
+#~ msgstr "Penghalusan Sudut"
+
+#~ msgid "Expand this row to pick a window."
+#~ msgstr "Luaskan baris ini untuk memilih jendela."
+
+#~ msgid ""
+#~ "Setup different clip padding by add window into this list.\n"
+#~ "\n"
+#~ "The item of list is instance part of WM_CLASS property with window. You "
+#~ "can pick a window to add it into this list."
+#~ msgstr ""
+#~ "Siapkan lapisan klip yang berbeda dengan menambahkan jendela ke dalam "
+#~ "daftar ini.\n"
+#~ "\n"
+#~ "Item daftar adalah bagian instan dari properti WM_CLASS dengan jendela. "
+#~ "Anda dapat memilih jendela untuk menambahkannya ke dalam daftar ini."
+
+#~ msgid "Remove Window from this List"
+#~ msgstr "Hapus Jendela dari Daftar ini"
+
+#~ msgid "Pick Window to add into list"
+#~ msgstr "Pilih Jendela untuk ditambahkan ke daftar"
+
+#~ msgid "Apply"
+#~ msgstr "Terapkan"
+
+#~ msgid "Blur Offset"
+#~ msgstr "Offset Buram"
+
+#~ msgid "Clip paddings of window"
+#~ msgstr "Clip paddings jendela"
+
+#~ msgid "Can't add to list, because it has exists"
+#~ msgstr "Tidak dapat menambahkan ke daftar, karena sudah ada"
+
+#~ msgid "Edit Shadow for Rounded Corners Windows"
+#~ msgstr "Edit Bayangan untuk Jendela Sudut Bulat"

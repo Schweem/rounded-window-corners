@@ -1,154 +1,120 @@
-// imports.gi
-import * as GObject from 'gi://GObject'
-import * as Gtk from 'gi://Gtk'
+/**
+ * @file Generic widget for choosing a window via a picker or a text entry.
+ * Used in the blacklist and custom settings pages.
+ */
 
-// local Modules
-import { show_err_msg, TIPS_EMPTY } from '../../utils/prefs.js'
-import { connections } from '../../utils/connections.js'
-import { on_picked, pick } from '../../dbus/client.js'
-import { gettext as _ } from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js'
-import { uri } from '../../utils/io.js'
+import Adw from 'gi://Adw';
+import GObject from 'gi://GObject';
+import Gtk from 'gi://Gtk';
 
-// types
+import {gettext as _} from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 
-// ----------------------------------------------------------------- end imports
+import {onPicked, pick} from '../../window_picker/client.js';
 
-export const AppRow = GObject.registerClass (
-  {
-    Template: uri (import.meta.url, 'app-row.ui'),
-    GTypeName: 'AppRow',
-    InternalChildren: [
-      'wm_class_instance_entry',
-      'remove_button',
-      'change_title_btn',
-      'pick_window_btn',
-      'title',
-      'description',
-      'expand_img',
-      'revealer',
-      'expanded_list_box',
-    ],
-  },
-  class extends Gtk.ListBoxRow {
-    private _wm_class_instance_entry!: Gtk.Entry
-    private _remove_button!: Gtk.Button
-    private _change_title_btn!: Gtk.Button
-    private _pick_window_btn!: Gtk.Button
-    private _title!: Gtk.Label
-    private _description!: Gtk.Label
-    private _expand_img!: Gtk.Button
-    private _revealer!: Gtk.Revealer
-    _expanded_list_box!: Gtk.ListBox
+export class AppRowClass extends Adw.ExpanderRow {
+    readonly #callbacks: AppRowCallbacks;
 
-    private bind_property_handler?: GObject.Binding
+    readonly #removeButton = new Gtk.Button({
+        icon_name: 'window-close-symbolic',
+        css_classes: ['flat', 'circular'],
+        valign: Gtk.Align.CENTER,
+    });
+    readonly #applyButton = new Gtk.Button({
+        icon_name: 'object-select-symbolic',
+        css_classes: ['flat', 'circular'],
+        valign: Gtk.Align.CENTER,
+    });
+    readonly #pickButton = new Gtk.Button({
+        icon_name: 'find-location-symbolic',
+        css_classes: ['flat', 'circular'],
+        valign: Gtk.Align.CENTER,
+    });
 
-    /** Store event handlers for this widget */
-    private cb?: AppRowHandler
+    readonly #wmClassEntry = new Adw.EntryRow({
+        title: _('Window class'),
+    });
 
-    _init (cb?: AppRowHandler) {
-      super._init ()
-      this.cb = cb
+    constructor(cb: AppRowCallbacks) {
+        super();
 
-      const c = connections.get ()
-      c.connect (this._remove_button, 'clicked', (btn: Gtk.Button) => {
-        if (this._revealer.reveal_child) {
-          this.disconnect_signals ()
+        this.#callbacks = cb;
+
+        this.#wmClassEntry.add_prefix(this.#applyButton);
+        this.#wmClassEntry.add_prefix(this.#pickButton);
+        this.add_row(this.#wmClassEntry);
+        this.add_suffix(this.#removeButton);
+
+        this.bind_property(
+            'subtitle',
+            this.#wmClassEntry,
+            'text',
+            GObject.BindingFlags.DEFAULT,
+        );
+
+        this.add_css_class('property');
+        this.set_title(_('Expand this row, to pick a window'));
+
+        this.#removeButton.connect('clicked', () => {
+            this.onDelete();
+        });
+        this.#pickButton.connect('clicked', () => {
+            this.pickWindow(this.#wmClassEntry);
+        });
+        this.#applyButton.connect('clicked', () => {
+            this.onTitleChange(this.#wmClassEntry);
+        });
+    }
+
+    onTitleChange(entry: Adw.EntryRow) {
+        // Skip if the title hasn't changed
+        if (this.subtitle === entry.text || entry.text === '') {
+            return;
         }
-        connections.get ().disconnect_all (btn)
-        connections.get ().disconnect_all (this)
-        cb && cb.on_delete && cb.on_delete (this, this._title.label)
-      })
 
-      c.connect (this._expand_img, 'clicked', () => this.on_expanded_changed ())
-    }
-
-    set title (t: string) {
-      this._title.label = t
-      this._title.visible = this._title.label != ''
-      this._description.visible = this._description.label != ''
-    }
-    get title (): string {
-      return this._title.label
-    }
-    set description (d: string) {
-      this._description.label = d
-      this._title.visible = this._title.label != ''
-      this._description.visible = this._description.label != ''
-    }
-
-    on_expanded_changed () {
-      this._revealer.reveal_child = !this._revealer.reveal_child
-      if (this._revealer.reveal_child) {
-        this._expand_img.add_css_class ('rotated')
-        this._wm_class_instance_entry.text = this._title.label
-        this.connect_signals ()
-        this.cb && this.cb.on_open && this.cb.on_open (this)
-      } else {
-        this._expand_img.remove_css_class ('rotated')
-        this.change_title ()
-        this.disconnect_signals ()
-        this.cb && this.cb.on_close && this.cb.on_close ()
-      }
-    }
-
-    add_row (child: Gtk.Widget) {
-      this._expanded_list_box.append (child)
-    }
-
-    private connect_signals () {
-      const c = connections.get ()
-      c.connect (this._change_title_btn, 'clicked', () => {
-        this.change_title ()
-      })
-      c.connect (this._pick_window_btn, 'clicked', () => {
-        on_picked ((wm_instance_class) => {
-          const title = _ ('Can\'t pick a window window from this position')
-          if (wm_instance_class == 'window-not-found') {
-            show_err_msg (title)
-            return
-          }
-          this._wm_class_instance_entry.text = wm_instance_class
-        })
-        pick ()
-      })
-    }
-
-    private disconnect_signals () {
-      this.bind_property_handler?.unbind ()
-      connections.get ().disconnect_all (this._change_title_btn)
-      connections.get ().disconnect_all (this._pick_window_btn)
-    }
-
-    private change_title () {
-      if (
-        !this.cb ||
-        !this.cb.on_title_changed ||
-        this._title.label == this._wm_class_instance_entry.text ||
-        this._wm_class_instance_entry.text == ''
-      ) {
-        return
-      }
-
-      if (
-        this.cb.on_title_changed (
-          this._title.label, // old title
-          this._wm_class_instance_entry.text // new title
-        )
-      ) {
-        this.title = this._wm_class_instance_entry.text
-        this.description = ''
-      } else {
-        if (this.title == '') {
-          this.description = TIPS_EMPTY ()
+        if (
+            this.#callbacks.onWindowChange(
+                this,
+                this.subtitle || '',
+                entry.text || '',
+            )
+        ) {
+            this.set_subtitle(entry.text || '');
         }
-      }
     }
-  }
-)
 
-export type AppRowHandler = {
-  on_delete?: (row: Gtk.ListBoxRow, item: string) => void
-  on_open?: (row: Gtk.ListBoxRow) => void
-  on_close?: () => void
-  on_title_changed?: (old_title: string, new_title: string) => boolean
+    onDelete() {
+        this.#callbacks.onDelete(this);
+    }
+
+    pickWindow(entry: Adw.EntryRow) {
+        onPicked(wmInstanceClass => {
+            if (wmInstanceClass === 'window-not-found') {
+                const win = this.root as unknown as Adw.PreferencesDialog;
+                win.add_toast(
+                    new Adw.Toast({
+                        title: _("Can't pick window from this position"),
+                    }),
+                );
+                return;
+            }
+            entry.text = wmInstanceClass;
+        });
+        pick();
+    }
 }
+
+export const AppRow = GObject.registerClass(
+    {
+        GTypeName: 'AppRow',
+    },
+    AppRowClass,
+);
+
+export type AppRowCallbacks = {
+    onDelete: (row: AppRowClass) => void;
+    onWindowChange: (
+        row: AppRowClass,
+        oldWmClass: string,
+        newWmClass: string,
+    ) => boolean;
+};

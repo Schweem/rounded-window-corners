@@ -1,0 +1,40 @@
+name: Build the extension
+
+on:
+  push:
+    paths-ignore:
+      - README.md
+  pull_request:
+    paths-ignore:
+      - README.md
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build the extension
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+
+      - name: Set up node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: latest
+          cache: 'npm'
+
+      - name: Set up just
+        uses: extractions/setup-just@v2
+
+      - name: Install gettext
+        run: sudo apt install gettext
+
+      - name: Build the extension
+        run: just build
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: rounded-window-corners@fxgn.shell-extension
+          path: _build/
+          compression-level: 9

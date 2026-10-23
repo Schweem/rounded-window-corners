@@ -1,0 +1,105 @@
+{
+    "$schema": "https://biomejs.dev/schemas/2.5.1/schema.json",
+    "files": {
+        "includes": ["**", "!**/_build/**/*"]
+    },
+    "assist": {
+        "actions": {
+            "source": {
+                "organizeImports": {
+                    "level": "on",
+                    "options": {
+                        "groups": [
+                            { "type": true },
+                            ":BLANK_LINE:",
+                            "gi://**",
+                            ":BLANK_LINE:",
+                            "resource://**",
+                            ":BLANK_LINE:"
+                        ]
+                    }
+                }
+            }
+        }
+    },
+    "linter": {
+        "includes": ["**", "!**/*.d.ts"],
+        "domains": {
+            "project": "all"
+        },
+        "rules": {
+            "preset": "all",
+            "complexity": {
+                "noExcessiveLinesPerFunction": "off",
+                "noForEach": "off",
+                "useMaxParams": "off"
+            },
+            "style": {
+                "noContinue": "off",
+                "noDefaultExport": "off",
+                "noExcessiveClassesPerFile": "off",
+                "noExcessiveLinesPerFile": "off",
+                "noHexColors": "off",
+                "noIncrementDecrement": "off",
+                "noMagicNumbers": "off",
+                "noTernary": "off",
+                "useBlockStatements": "off",
+                "useDestructuring": "off",
+                "useExportsLast": "off",
+                "useGlobalThis": "off",
+                "useNamingConvention": {
+                    "level": "error",
+                    "options": {
+                        "conventions": [
+                            {
+                                // Whitelist some GJS names that don't follow the JS naming conventions
+                                "match": "(?:G[A-Z].*|vfunc_.*|Template|InternalChildren|icon_name|css_classes|draw_value|value_pos|round_digits|Properties|Padding.*|(.*))"
+                            }
+                        ]
+                    }
+                },
+                "useConsistentTypeDefinitions": {
+                    "level": "error",
+                    "options": {
+                        "style": "type"
+                    }
+                }
+            },
+            "performance": {
+                "noDelete": "off",
+                "noNamespaceImport": "off"
+            },
+            "correctness": {
+                "noUnknownTypeSelector": "off",
+                "noUnresolvedImports": "off",
+                "useImportExtensions": {
+                    "level": "error",
+                    "options": {
+                        "forceJsExtensions": true
+                    }
+                }
+            },
+            "suspicious": {
+                "noConsole": "off",
+                "noForIn": "off",
+                "noShadow": "off",
+                "useGuardForIn": "off"
+            },
+            "security": {
+                "noSecrets": "off"
+            }
+        }
+    },
+    "formatter": {
+        "indentStyle": "space",
+        "indentWidth": 4
+    },
+    "javascript": {
+        "formatter": {
+            "quoteStyle": "single",
+            "bracketSpacing": false,
+            "arrowParentheses": "asNeeded"
+        },
+        "globals": ["global", "log", "logError"]
+    }
+}

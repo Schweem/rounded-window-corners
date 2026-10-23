@@ -1,15 +1,3 @@
-yarn.lock
-*lock*
-builddir
-[_]build
-node_modules
-@gi
-.vagrant
-Vagrantfile
-.ts-for-girrc.js
-docs.json
-*.log
-.tmp
-.vscode
+_build
 *.zip
-*.po
+node_modules
