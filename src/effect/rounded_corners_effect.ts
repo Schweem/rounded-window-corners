@@ -2,58 +2,24 @@
 
 import type {Bounds, RoundedCornerSettings} from '../utils/types.js';
 
-import Cogl from 'gi://Cogl';
 import GObject from 'gi://GObject';
-import Shell from 'gi://Shell';
 
 import {readShader} from '../utils/file.js';
 import {getPref} from '../utils/settings.js';
+import {snippetEffect} from './snippet_effect.js';
 
 const [declarations, code] = await readShader(
     import.meta.url,
     'shader/rounded_corners.frag',
 );
 
-class Uniforms {
-    bounds = 0;
-    clipRadius = 0;
-    borderWidth = 0;
-    borderColor = 0;
-    borderedAreaBounds = 0;
-    borderedAreaClipRadius = 0;
-    exponent = 0;
-    pixelStep = 0;
-}
-
 export const RoundedCornersEffect = GObject.registerClass(
     {},
-    class Effect extends Shell.GLSLEffect {
-        /**
-         * To store a uniform value, we need to know its location in the shader,
-         * which is done by calling `this.get_uniform_location()`. This is
-         * expensive, so we cache the location of uniforms when the shader is
-         * created.
-         */
-        static uniforms: Uniforms = new Uniforms();
-
-        constructor() {
-            super();
-
-            for (const k in Effect.uniforms) {
-                Effect.uniforms[k as keyof Uniforms] =
-                    this.get_uniform_location(k);
-            }
-        }
-
-        vfunc_build_pipeline() {
-            this.add_glsl_snippet(
-                Cogl.SnippetHook.FRAGMENT,
-                declarations,
-                code,
-                false,
-            );
-        }
-
+    class Effect extends snippetEffect(
+        'RwcSnippetEffectRoundedCorners',
+        declarations,
+        code,
+    ) {
         /**
          * Update uniforms of the shader.
          * For more information, see the comments in the shader file.
@@ -127,21 +93,16 @@ export const RoundedCornersEffect = GObject.registerClass(
             pixelStep: number[],
             exponent: number,
         ) {
-            const uniforms = Effect.uniforms;
-            this.set_uniform_float(uniforms.bounds, 4, bounds);
-            this.set_uniform_float(uniforms.clipRadius, 1, [radius]);
-            this.set_uniform_float(uniforms.borderWidth, 1, [borderWidth]);
-            this.set_uniform_float(uniforms.borderColor, 4, borderColor);
-            this.set_uniform_float(
-                uniforms.borderedAreaBounds,
-                4,
-                borderedAreaBounds,
-            );
-            this.set_uniform_float(uniforms.borderedAreaClipRadius, 1, [
+            this.setUniformFloat('bounds', 4, bounds);
+            this.setUniformFloat('clipRadius', 1, [radius]);
+            this.setUniformFloat('borderWidth', 1, [borderWidth]);
+            this.setUniformFloat('borderColor', 4, borderColor);
+            this.setUniformFloat('borderedAreaBounds', 4, borderedAreaBounds);
+            this.setUniformFloat('borderedAreaClipRadius', 1, [
                 borderedAreaRadius,
             ]);
-            this.set_uniform_float(uniforms.pixelStep, 2, pixelStep);
-            this.set_uniform_float(uniforms.exponent, 1, [exponent]);
+            this.setUniformFloat('pixelStep', 2, pixelStep);
+            this.setUniformFloat('exponent', 1, [exponent]);
             this.queue_repaint();
         }
     },
